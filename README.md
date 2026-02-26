@@ -16,4 +16,4 @@ npx skills add monorepo-labs/skills --skill supacortex
 
 | Skill | Description |
 |-------|-------------|
-| [supacortex](./supacortex/) | Bookmarks, conversation memory, and identity for [Supacortex](https://supacortex.ai) |
+| [supacortex](./supacortex/) | Bookmarks and conversation memory for [Supacortex](https://supacortex.ai) |

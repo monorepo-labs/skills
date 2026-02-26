@@ -1,16 +1,16 @@
 ---
 name: supacortex
-description: Manage bookmarks, conversation memory, and identity context using the Supacortex CLI. Use when saving bookmarks, summarizing chat sessions, storing user preferences, or recalling previous conversations and saved content.
-allowed-tools: Bash(scx bookmarks *) Bash(scx conversation *) Bash(scx identity *)
+description: Personal memory layer — save bookmarks and conversation summaries using the Supacortex CLI. Use when the user says "save to cortex", "save to supacortex", "save this session", or asks to recall past conversations.
+allowed-tools: Bash(scx bookmarks *) Bash(scx conversation *)
 compatibility: Requires the scx CLI to be installed and authenticated (scx login)
 metadata:
   author: monorepo-labs
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Supacortex — CLI Skill
 
-Supacortex is a personal knowledge workspace. Three CLI commands: bookmarks, conversations, and identity.
+Supacortex is a personal memory layer. Two CLI commands: bookmarks and conversations.
 
 ## Setup
 
@@ -21,7 +21,7 @@ scx login
 
 ## 1. Bookmarks (`scx bookmarks`)
 
-Save and search bookmarks (tweets, links, YouTube videos).
+Save and search bookmarks (links, YouTube videos).
 
 ### Commands
 
@@ -51,9 +51,9 @@ scx bookmarks delete <id> [--pretty]
 
 ### When to use bookmarks
 
-- User asks to save a link or tweet
+- User asks to save a link or YouTube video
 - User wants to search their saved content
-- When you need to reference previously saved URLs or tweets
+- When you need to reference previously saved URLs
 
 ## 2. Conversations (`scx conversation`)
 
@@ -64,8 +64,8 @@ Save summaries of AI chat sessions. Every conversation has a **tier** that deter
 | Tier | When to use | Content format |
 |------|-------------|----------------|
 | `brief` | Throwaway queries, quick lookups | Single sentence: "Asked about JSON parsing in Bun" |
-| `summary` | Most working sessions | 3-8 bullet points covering what was discussed, decided, and found |
-| `detailed` | Deep sessions with architectural decisions, research findings | Full structured document with reasoning, code snippets, follow-ups |
+| `summary` | Most working sessions | Markdown — 3-8 bullet points covering what was discussed, decided, and found |
+| `detailed` | Deep sessions with architectural decisions, research findings | Markdown — full structured document with headings, reasoning, code snippets, follow-ups |
 
 ### Commands
 
@@ -122,86 +122,18 @@ scx conversation delete <id> [--pretty]
 
 ### When to save conversations
 
-- At the end of a productive session — summarize what was done
-- When the user says "save this session" or "remember this"
-- After making architectural decisions worth preserving
-- When the user asks "what did we work on?" — search past conversations first
+Save when the user says:
+- "save to cortex" / "save to supacortex"
+- "save this session" / "remember this"
+- "log this conversation"
 
-## 3. Identity (`scx identity`)
+### When to recall conversations
 
-Store persistent context about the user so AI agents can be useful without the user repeating themselves.
-
-### Categories
-
-| Category | What it stores | How often it changes |
-|----------|---------------|---------------------|
-| `core` | Name, location, what they do, background | Rarely |
-| `goals` | Current focus, bigger picture objectives | Every few months |
-| `preferences` | Tech choices, communication style, workflow | Discovered over time |
-| `interests` | Topics they're drawn to, areas of curiosity | Keeps growing |
-
-### Commands
-
-#### Add an identity entry
-
-```bash
-scx identity add "<content>" [--title "<title>"] [--category <core|goals|preferences|interests>] [--metadata '<json>'] [--pretty]
-```
-
-**Examples:**
-
-```bash
-# Core profile
-scx identity add "Yogesh, solo founder based in Nepal. Building Supacortex and Supalytics." \
-  --title "Core profile" \
-  --category core
-
-# Goals
-scx identity add "Ship Supacortex memory layer, then CLI and API as the product" \
-  --title "Current focus" \
-  --category goals
-
-# Preferences
-scx identity add "Next.js, Drizzle, Bun, Postgres, Tailwind. Casual and direct communication." \
-  --title "Tech and communication preferences" \
-  --category preferences
-
-# Interests
-scx identity add "AI agent memory systems, indie hacking, self-hosting, vectorless RAG" \
-  --title "Current interests" \
-  --category interests
-```
-
-#### List identity entries
-
-```bash
-scx identity list [--search "<query>"] [--category <core|goals|preferences|interests>] [--limit <n>] [--pretty]
-```
-
-#### Get an entry by ID
-
-```bash
-scx identity get <id> [--pretty]
-```
-
-#### Update an entry
-
-```bash
-scx identity update <id> [--title "<title>"] [--content "<content>"] [--category <category>] [--metadata '<json>'] [--pretty]
-```
-
-#### Delete an entry
-
-```bash
-scx identity delete <id> [--pretty]
-```
-
-### When to use identity
-
-- User shares something about themselves worth remembering ("I just switched to Stripe", "I'm based in Nepal")
-- User explicitly asks to save identity info ("remember that I prefer Bun over Node")
-- At initial setup — help the user create their core profile
-- When you need user context — fetch identity entries before responding to personalize the answer
+Pull past conversations when the user says:
+- "check my conversation about X"
+- "pull the X conversation"
+- "get the summary for X"
+- "what did we work on last time?"
 
 ## Metadata
 
@@ -209,13 +141,13 @@ Metadata is freeform JSON passed via `--metadata`. The AI decides what to store.
 
 - `source` — where this was captured ("claude-code", "chatgpt", "opencode")
 - `tags` — array of topic tags
-- `project` — which project the conversation was about
-- `category` — for identity entries: "core", "goals", "preferences", "interests"
+- `project` — which project the conversation was about (e.g. "supacortex", "supalytics")
+- `category` — topic area: "project", "life", "general", "learning", "work"
 
 ## Consistent verbs across all commands
 
-All three commands (`bookmarks`, `conversation`, `identity`) support: `list`, `add`, `get`, `delete`.
+Both commands (`bookmarks`, `conversation`) support: `list`, `add`, `get`, `delete`.
 
-`conversation` and `identity` also support: `update`.
+`conversation` also supports: `update`.
 
 All commands output JSON by default (optimized for AI agents). Use `--pretty` for human-readable output.
